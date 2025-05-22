@@ -13,6 +13,11 @@ function setup() {
 function draw() {
   background(240);
 
+  // Draw walls
+  stroke(0);
+  noFill();
+  rect(0, 0, width - 1, height - 1);
+
   for (let agent of agents) {
     agent.update();
     agent.display();
@@ -36,11 +41,25 @@ class Agent {
     let velocity = p5.Vector.fromAngle(this.heading).mult(this.speed);
     this.pos.add(velocity);
 
-    // Wrap around the edges
-    if (this.pos.x > width) this.pos.x = 0;
-    if (this.pos.x < 0) this.pos.x = width;
-    if (this.pos.y > height) this.pos.y = 0;
-    if (this.pos.y < 0) this.pos.y = height;
+    // Reflect off walls
+    if (this.pos.x > width) {
+      this.pos.x = width;
+      this.heading = PI - this.heading;
+    } else if (this.pos.x < 0) {
+      this.pos.x = 0;
+      this.heading = PI - this.heading;
+    }
+
+    if (this.pos.y > height) {
+      this.pos.y = height;
+      this.heading = TWO_PI - this.heading;
+    } else if (this.pos.y < 0) {
+      this.pos.y = 0;
+      this.heading = TWO_PI - this.heading;
+    }
+
+    // Normalize heading
+    this.heading = (this.heading % TWO_PI + TWO_PI) % TWO_PI;
   }
 
   display() {
